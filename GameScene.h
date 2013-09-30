@@ -11,6 +11,8 @@
 #import "InputLayer.h"
 
 @class Player;
+@class Top;
+@class Goal;
 @interface GameScene : CCScene <InputLayerDelegate>
 {
     CGSize _winSize;
@@ -18,7 +20,8 @@
     CCLayerGradient *_skyLayer;
     CGFloat _windSpeed;
     Player *_player;
-    
+    Top *_top;
+    Goal *_goal;
     ChipmunkSpace *_space;
     ccTime _accumulator;
     CCParallaxNode *_parallaxNode;

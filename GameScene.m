@@ -10,6 +10,8 @@
 #import "Player.h"
 #import "InputLayer.h"
 #import "ChipmunkAutoGeometry.h"
+#import "Top.h"
+#import "Goal.h"
 
 
 @implementation GameScene
@@ -26,7 +28,6 @@
         _configuration = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Configuration" ofType:@"plist"]];
 
         _space = [[ChipmunkSpace alloc]init];
-        CGFloat gravity = [_configuration[@"gravity"] floatValue];
         _space.gravity = ccp(0.0f, -100);
         
         
@@ -40,14 +41,15 @@
         debugNode.visible = YES;
         [self addChild:debugNode];
     
-       /* NSString *playerPositionString = _configuration[@"playerPosition"];
-        playerPositionString = @"200,200";
-        _player = [[Player alloc] initWithPosition:CGPointFromString(playerPositionString)];*/
-        CGPoint _point;
-        _point.x = 30;
-        _point.y = 180;
-        _player = [[Player alloc] initWithPosition:_space position:_point];
+        _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 180)];
         [_gameNode addChild:_player];
+        
+        //Adding top part of map.
+        _top = [[Top alloc] initWithSpace:_space position:CGPointMake(400, 420)];
+        [_gameNode addChild:_top];
+        
+        _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
+        [_gameNode addChild:_goal];
         
         InputLayer *inputLayer = [[InputLayer alloc] init];
         inputLayer.delegate = self;
@@ -69,7 +71,7 @@
     [self addChild:_parallaxNode];
     
     CCSprite *top = [CCSprite spriteWithFile:@"Top.png"];
-    top.anchorPoint = ccp(0,-1.45);
+    top.anchorPoint = ccp(0,-0.70);
     [_parallaxNode addChild:top z:1 parallaxRatio:ccp(1.0f, 1.0f) positionOffset: CGPointZero];
     
     CCSprite *back = [CCSprite spriteWithFile:@"Background.png"];
@@ -131,6 +133,9 @@
 #pragma mark - My Touch Delegate Methods
 
 - (void)touchEnded{
+    if(_followPlayer == NO){
+        [_player walk];
+    }
     _followPlayer = YES;
     [_player jump];
     /*CCMoveBy *move = [CCMoveBy actionWithDuration: 5 position:ccp(400,0)];
