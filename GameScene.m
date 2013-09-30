@@ -12,6 +12,7 @@
 #import "ChipmunkAutoGeometry.h"
 #import "Top.h"
 #import "Goal.h"
+#import "SimpleAudioEngine.h"
 
 
 @implementation GameScene
@@ -30,7 +31,11 @@
         _space = [[ChipmunkSpace alloc]init];
         _space.gravity = ccp(0.0f, -100);
         
-        
+        [_space setDefaultCollisionHandler:self
+                                     begin:@selector(collisionBegan:space:)
+                                  preSolve:nil
+                                 postSolve:nil
+                                  separate:nil];
         
                           
         [self generateRandomWind];
@@ -60,6 +65,23 @@
         [self scheduleUpdate];
     }
     return self;
+}
+
+- (bool)collisionBegan:(cpArbiter *)arbiter space:(ChipmunkSpace*)space{
+    cpBody *firstBody;
+    cpBody *secondBody;
+    cpArbiterGetBodies(arbiter, &firstBody, &secondBody);
+    
+    ChipmunkBody *firstChipmunkBody = firstBody->data;
+    ChipmunkBody *secondChipmunkBody = secondBody->data;
+    
+    if((firstChipmunkBody == _player.chipmunkBody && secondChipmunkBody == _goal.chipmunkBody)||(firstChipmunkBody == _goal.chipmunkBody && secondChipmunkBody == _player.chipmunkBody)){
+        NSLog(@"Collision!");
+        [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:1 pan:0 gain:1];
+        
+    }
+    
+    return YES;
 }
 
 - (void)setupGraphicsLandscape
