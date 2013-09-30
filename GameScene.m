@@ -13,6 +13,7 @@
 #import "Top.h"
 #import "Goal.h"
 #import "SimpleAudioEngine.h"
+#import "CCParticleSystemQuad.h"
 
 
 @implementation GameScene
@@ -42,9 +43,11 @@
         [self setupGraphicsLandscape];
         [self setupPhysicsLandscape];
         
+        
+        /*
         CCPhysicsDebugNode *debugNode = [CCPhysicsDebugNode debugNodeForChipmunkSpace:_space];
         debugNode.visible = YES;
-        [self addChild:debugNode];
+        [self addChild:debugNode];*/
     
         _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 180)];
         [_gameNode addChild:_player];
@@ -55,6 +58,14 @@
         
         _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
         [_gameNode addChild:_goal];
+        
+        _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
+        _particle.position = _goal.position;
+        [_particle stopSystem];
+        [_gameNode addChild:_particle];
+        
+        //preload sound
+        [[SimpleAudioEngine sharedEngine] preloadEffect:@"Impact.wav"];
         
         InputLayer *inputLayer = [[InputLayer alloc] init];
         inputLayer.delegate = self;
@@ -77,7 +88,16 @@
     
     if((firstChipmunkBody == _player.chipmunkBody && secondChipmunkBody == _goal.chipmunkBody)||(firstChipmunkBody == _goal.chipmunkBody && secondChipmunkBody == _player.chipmunkBody)){
         NSLog(@"Collision!");
-        [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:1 pan:0 gain:1];
+        [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
+        
+        [_space smartRemove:_player.chipmunkBody];
+        for(ChipmunkShape *shape in _player.chipmunkBody.shapes){
+            [_space smartRemove:shape];
+        }
+        
+        [_player removeFromParentAndCleanup:YES];
+        
+        [_particle resetSystem];
         
     }
     
