@@ -10,10 +10,10 @@
 #import "cocos2d.h"
 
 @interface WaterBomb : CCPhysicsSprite{
-    
+    @public
+    BOOL used;
 }
 
 - (id)initWithSpace:(ChipmunkSpace
                      *)space position:(CGPoint)position;
-
 @end

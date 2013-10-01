@@ -63,11 +63,11 @@
         _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
         [_gameNode addChild:_goal];
         
-        _waterBomb = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(230, 120)];
-        [_gameNode addChild:_waterBomb];
+        _waterBomb1 = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(230, 120)];
+        [_gameNode addChild:_waterBomb1];
         
         _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
-        _particle.position = _goal.position;
+        _particle.position = _waterBomb1.position;
         [_particle stopSystem];
         [_gameNode addChild:_particle];
         
@@ -101,7 +101,6 @@
     
     // character reached goal
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_goal.chipmunkBody]){
-        [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
         
         [_space smartRemove:_player.chipmunkBody];
         for(ChipmunkShape *shape in _player.chipmunkBody.shapes){
@@ -110,8 +109,19 @@
         
         [_player removeFromParentAndCleanup:YES];
         
-        [_particle resetSystem];
         
+    }
+    
+    
+    //if player hits waterbarrel
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_waterBomb1.chipmunkBody]){
+        if(_waterBomb1->used == NO){
+            [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
+         [_player hitbybomb];
+        _followPlayer = NO;
+        _hitByBomb = YES;
+            _waterBomb1->used = YES;
+            [_particle resetSystem];}
     }
     
     return YES;
@@ -189,7 +199,8 @@
 
 - (void)touchEnded{
     if(_followPlayer == NO){
-        [_player walk];
+        [_player walk:_hitByBomb];
+        _hitByBomb = NO;
     }
     _followPlayer = YES;
     [_player jump];

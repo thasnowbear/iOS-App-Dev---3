@@ -15,5 +15,6 @@
 
 - (id)initWithPosition:(ChipmunkSpace *)space position:(CGPoint)position;
 - (void)jump;
-- (void)walk;
+- (void)walk:(BOOL *)hitbybomb;
+- (void)hitbybomb;
 @end

@@ -23,7 +23,7 @@
         shape.sensor = YES;
         
         [space addShape:shape];
-        
+        used = NO;
         body.data = self;
         self.chipmunkBody = body;
         

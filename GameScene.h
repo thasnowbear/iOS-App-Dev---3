@@ -23,13 +23,14 @@
     Player *_player;
     Top *_top;
     Goal *_goal;
-    WaterBomb *_waterBomb;
+    WaterBomb *_waterBomb1;
     ChipmunkSpace *_space;
     ccTime _accumulator;
     CCParallaxNode *_parallaxNode;
     CCParticleSystemQuad *_particle;
     CCNode *_gameNode;
     BOOL _followPlayer;
+    BOOL _hitByBomb;
     CGFloat _landscapeWidth;
 }
 

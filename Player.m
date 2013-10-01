@@ -43,9 +43,21 @@
     [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
 }
 
-- (void)walk
+- (void)walk:(BOOL*)hitbybomb
 {
+    if(hitbybomb == NO){
     cpVect impulseVector = cpv(75 * self.chipmunkBody.mass, 0);
+    [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
+    }
+    else{
+        cpVect impulseVector = cpv(200 * self.chipmunkBody.mass, 0);
+        [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
+    }
+}
+
+- (void)hitbybomb
+{
+    cpVect impulseVector = cpv(-175 * self.chipmunkBody.mass, 75 * self.chipmunkBody.mass);
     [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
 }
 
