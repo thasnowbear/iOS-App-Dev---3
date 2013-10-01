@@ -34,6 +34,15 @@
         _space = [[ChipmunkSpace alloc]init];
         _space.gravity = ccp(0.0f, -100);
         
+        score = 0;
+
+        NSNumber *myDoubleNumber = [NSNumber numberWithDouble:score];
+        NSString *textScore = [NSString stringWithFormat:@"Score: %@", [myDoubleNumber stringValue]];
+        scoreLabel = [CCLabelTTF labelWithString:textScore fontName:@"Arial" fontSize:20];
+        scoreLabel.color = ccBLACK;
+        scoreLabel.position = ccp(300, 50);
+        [self addChild:scoreLabel z:1];
+        
         [_space setDefaultCollisionHandler:self
                                      begin:@selector(collisionBegan:space:)
                                   preSolve:nil
@@ -88,6 +97,13 @@
     }
     return self;
 }
+
+- (void)addPoints{
+    NSNumber *myDoubleNumber = [NSNumber numberWithDouble:score];
+    [scoreLabel setString:[NSString stringWithFormat:@"Score: %@", [myDoubleNumber stringValue]]];
+}
+
+
 - (BOOL)helper:(ChipmunkBody *)firstInput firstEqual:(ChipmunkBody *)firstEqual secondInput:(ChipmunkBody *) secondInput secondEqual:(ChipmunkBody *)secondEqual{
     if((firstInput == firstEqual && secondInput == secondEqual)||(firstInput == secondEqual && secondInput == firstEqual))
         return true;
@@ -112,6 +128,7 @@
         }
         
         [_player removeFromParentAndCleanup:YES];
+        [[CCDirector sharedDirector] popScene];
         
         
     }
@@ -133,6 +150,7 @@
     //if player hits coin
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_coin.chipmunkBody]){
         score += 1000;
+        [self addPoints];
         for(ChipmunkShape *shape in _coin.chipmunkBody.shapes){
             [_space smartRemove:shape];
         }
@@ -210,8 +228,11 @@
         {
             _parallaxNode.position = ccp(-(_player.position.x - (_winSize.width / 2)), 0);
         }
+        
+        score += 1;
+        [self addPoints];
     }
-
+    
     // Update logic goes here
 }
 

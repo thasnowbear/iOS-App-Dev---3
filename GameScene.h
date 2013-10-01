@@ -17,6 +17,8 @@
 @class Coins;
 @interface GameScene : CCScene <InputLayerDelegate>
 {
+    int thescore;
+    CCLabelTTF *scoreLabel;
     CGSize _winSize;
     NSDictionary *_configuration;
     CCLayerGradient *_skyLayer;
@@ -37,5 +39,7 @@
     BOOL _hitByBomb;
     CGFloat _landscapeWidth;
 }
+
+-(void)addPoints;
 
 @end
