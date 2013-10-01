@@ -14,7 +14,7 @@
 
 - (id)initWithPosition:(ChipmunkSpace *)space position:(CGPoint)position;
 {
-    self = [super initWithFile:@"Player1.png"];
+    self = [super initWithFile:@"PlayerFinal.png"];
     if(self)
     {
         _space = space;

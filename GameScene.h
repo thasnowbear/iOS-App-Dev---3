@@ -13,6 +13,7 @@
 @class Player;
 @class Top;
 @class Goal;
+@class WaterBomb;
 @interface GameScene : CCScene <InputLayerDelegate>
 {
     CGSize _winSize;
@@ -22,6 +23,7 @@
     Player *_player;
     Top *_top;
     Goal *_goal;
+    WaterBomb *_waterBomb;
     ChipmunkSpace *_space;
     ccTime _accumulator;
     CCParallaxNode *_parallaxNode;

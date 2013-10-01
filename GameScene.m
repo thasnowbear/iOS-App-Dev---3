@@ -14,6 +14,7 @@
 #import "Goal.h"
 #import "SimpleAudioEngine.h"
 #import "CCParticleSystemQuad.h"
+#import "WaterBomb.h"
 
 
 @implementation GameScene
@@ -27,7 +28,7 @@
         srandom(time(NULL));
         _winSize = [CCDirector sharedDirector].winSize;
         //cant make it work for some reason
-        _configuration = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Configuration" ofType:@"plist"]];
+        _configuration = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Config" ofType:@"plist"]];
 
         _space = [[ChipmunkSpace alloc]init];
         _space.gravity = ccp(0.0f, -100);
@@ -48,8 +49,11 @@
         CCPhysicsDebugNode *debugNode = [CCPhysicsDebugNode debugNodeForChipmunkSpace:_space];
         debugNode.visible = YES;
         [self addChild:debugNode];*/
+        
+       /* NSString *playerposition = _configuration[@"playerposition"];
+        _player = [[Player alloc]initWithPosition:_space position:CGPointFromString(playerposition)];*/
     
-        _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 180)];
+        _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 125)];
         [_gameNode addChild:_player];
         
         //Adding top part of map.
@@ -58,6 +62,9 @@
         
         _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
         [_gameNode addChild:_goal];
+        
+        _waterBomb = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(230, 120)];
+        [_gameNode addChild:_waterBomb];
         
         _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
         _particle.position = _goal.position;
@@ -77,6 +84,11 @@
     }
     return self;
 }
+- (BOOL)helper:(ChipmunkBody *)firstInput firstEqual:(ChipmunkBody *)firstEqual secondInput:(ChipmunkBody *) secondInput secondEqual:(ChipmunkBody *)secondEqual{
+    if((firstInput == firstEqual && secondInput == secondEqual)||(firstInput == secondEqual && secondInput == firstEqual))
+        return true;
+    return FALSE;
+}
 
 - (bool)collisionBegan:(cpArbiter *)arbiter space:(ChipmunkSpace*)space{
     cpBody *firstBody;
@@ -86,8 +98,9 @@
     ChipmunkBody *firstChipmunkBody = firstBody->data;
     ChipmunkBody *secondChipmunkBody = secondBody->data;
     
-    if((firstChipmunkBody == _player.chipmunkBody && secondChipmunkBody == _goal.chipmunkBody)||(firstChipmunkBody == _goal.chipmunkBody && secondChipmunkBody == _player.chipmunkBody)){
-        NSLog(@"Collision!");
+    
+    // character reached goal
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_goal.chipmunkBody]){
         [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
         
         [_space smartRemove:_player.chipmunkBody];
