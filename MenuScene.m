@@ -16,13 +16,15 @@
     self = [super init];
     if(self != nil)
     {
+        _windowSize = [CCDirector sharedDirector].winSize;
+        
         CCLabelTTF *label = [CCLabelTTF labelWithString:@"START" fontName:@"Arial" fontSize:48];
         CCMenuItemLabel *button = [CCMenuItemLabel itemWithLabel:label block:^(id sender)
         {
             GameScene *gameScene = [[GameScene alloc] init];
             [[CCDirector sharedDirector] pushScene:[CCTransitionFade transitionWithDuration:1.0 scene:gameScene]];
         }];
-        button.position = ccp(200,200);
+        button.position = ccp(_windowSize.width/2,_windowSize.height/2);
         
         CCMenu *menu = [CCMenu menuWithItems:button, nil];
         menu.position = CGPointZero;

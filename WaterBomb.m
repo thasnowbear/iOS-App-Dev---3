@@ -13,7 +13,7 @@
 
 -(id)initWithSpace:(ChipmunkSpace *)space position: (CGPoint) position
 {
-    self = [super initWithFile:@"WaterBarrel.png"];
+    self = [super initWithFile:@"Waterfinal.png"];
     if(self){
         CGSize size = self.textureRect.size;
         

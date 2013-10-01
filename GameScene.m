@@ -79,6 +79,7 @@
         _coin = [[Coins alloc] initWithSpace:_space position:CGPointMake(430, 220)];
         [_gameNode addChild:_coin];
         
+        
         _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
         _particle.position = _waterBomb1.position;
         [_particle stopSystem];
@@ -86,6 +87,7 @@
         
         //preload sound
         [[SimpleAudioEngine sharedEngine] preloadEffect:@"Impact.wav"];
+        [[SimpleAudioEngine sharedEngine] preloadEffect:@"smw_coin.wav"];
         
         InputLayer *inputLayer = [[InputLayer alloc] init];
         inputLayer.delegate = self;
@@ -149,6 +151,7 @@
     
     //if player hits coin
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_coin.chipmunkBody]){
+        [[SimpleAudioEngine sharedEngine] playEffect:@"smw_coin.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
         score += 1000;
         [self addPoints];
         for(ChipmunkShape *shape in _coin.chipmunkBody.shapes){

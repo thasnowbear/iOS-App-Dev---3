@@ -8,8 +8,11 @@
 
 #import "CCScene.h"
 
-@interface MenuScene : CCScene
-
+@interface MenuScene : CCScene{
+    
+    CGSize _windowSize;
+    
+}
 
 
 @end

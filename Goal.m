@@ -13,13 +13,13 @@
 
 -(id)initWithSpace:(ChipmunkSpace *)space position: (CGPoint) position
 {
-    self = [super initWithFile:@"Player1.png"];
+    self = [super initWithFile:@"door.png"];
     if(self){
         CGSize size = self.textureRect.size;
         
         ChipmunkBody *body = [ChipmunkBody staticBody];
         body.pos = position;
-        ChipmunkShape *shape = [ChipmunkPolyShape boxWithBody:body width:size.width height:size.height];
+        ChipmunkShape *shape = [ChipmunkPolyShape boxWithBody:body width:size.width/5 height:size.height];
         shape.sensor = YES;
         
         [space addShape:shape];
