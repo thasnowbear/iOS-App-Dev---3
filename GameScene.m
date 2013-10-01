@@ -16,6 +16,7 @@
 #import "CCParticleSystemQuad.h"
 #import "WaterBomb.h"
 #import "Coins.h"
+#import "Shield.h"
 
 
 @implementation GameScene
@@ -36,68 +37,77 @@
         
         score = 0;
 
-        NSNumber *myDoubleNumber = [NSNumber numberWithDouble:score];
-        NSString *textScore = [NSString stringWithFormat:@"Score: %@", [myDoubleNumber stringValue]];
-        scoreLabel = [CCLabelTTF labelWithString:textScore fontName:@"Arial" fontSize:20];
-        scoreLabel.color = ccBLACK;
-        scoreLabel.position = ccp(300, 50);
-        [self addChild:scoreLabel z:1];
         
         [_space setDefaultCollisionHandler:self
                                      begin:@selector(collisionBegan:space:)
                                   preSolve:nil
                                  postSolve:nil
                                   separate:nil];
-        
-                          
-        [self generateRandomWind];
         [self setupGraphicsLandscape];
         [self setupPhysicsLandscape];
+        //setting up character, and items and such
+        [self setUpEnviroment];
+        //loading particles
+        [self setUpParticles];
+        //loading sounds
+        [self setUpSounds];
+        //putting up a scorelabel for player to see score.
+        [self setUpScoreLabel];
         
         
-        /*
-        CCPhysicsDebugNode *debugNode = [CCPhysicsDebugNode debugNodeForChipmunkSpace:_space];
-        debugNode.visible = YES;
-        [self addChild:debugNode];*/
-        
-       /* NSString *playerposition = _configuration[@"playerposition"];
-        _player = [[Player alloc]initWithPosition:_space position:CGPointFromString(playerposition)];*/
-    
-        _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 125)];
-        [_gameNode addChild:_player];
-        
-        //Adding top part of map.
-        _top = [[Top alloc] initWithSpace:_space position:CGPointMake(400, 420)];
-        [_gameNode addChild:_top];
-        
-        _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
-        [_gameNode addChild:_goal];
-        
-        _waterBomb1 = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(230, 120)];
-        [_gameNode addChild:_waterBomb1];
-        
-        _coin = [[Coins alloc] initWithSpace:_space position:CGPointMake(430, 220)];
-        [_gameNode addChild:_coin];
-        
-        
-        _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
-        _particle.position = _waterBomb1.position;
-        [_particle stopSystem];
-        [_gameNode addChild:_particle];
-        
-        //preload sound
-        [[SimpleAudioEngine sharedEngine] preloadEffect:@"Impact.wav"];
-        [[SimpleAudioEngine sharedEngine] preloadEffect:@"smw_coin.wav"];
         
         InputLayer *inputLayer = [[InputLayer alloc] init];
         inputLayer.delegate = self;
         [self addChild:inputLayer];
         
-        
-        
         [self scheduleUpdate];
     }
     return self;
+}
+
+- (void)setUpScoreLabel{
+    NSNumber *myDoubleNumber = [NSNumber numberWithDouble:score];
+    NSString *textScore = [NSString stringWithFormat:@"Score: %@", [myDoubleNumber stringValue]];
+    scoreLabel = [CCLabelTTF labelWithString:textScore fontName:@"Arial" fontSize:20];
+    scoreLabel.color = ccBLACK;
+    scoreLabel.position = ccp(300, 50);
+    [self addChild:scoreLabel z:1];
+
+}
+
+- (void)setUpEnviroment{
+    
+    _player = [[Player alloc] initWithPosition:_space position:CGPointMake(30, 125)];
+    [_gameNode addChild:_player];
+    _player->shield = NO;
+    
+    //Adding top part of map.
+    _top = [[Top alloc] initWithSpace:_space position:CGPointMake(400, 420)];
+    [_gameNode addChild:_top];
+    
+    _goal = [[Goal alloc] initWithSpace:_space position:CGPointMake(900, 160)];
+    [_gameNode addChild:_goal];
+    
+    _waterBomb1 = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(630, 120)];
+    [_gameNode addChild:_waterBomb1];
+    
+    _coin = [[Coins alloc] initWithSpace:_space position:CGPointMake(430, 220)];
+    [_gameNode addChild:_coin];
+    
+    _shield = [[Shield alloc] initWithSpace:_space position:CGPointMake(230, 120)];
+    [_gameNode addChild:_shield];
+}
+
+-(void) setUpSounds{
+    [[SimpleAudioEngine sharedEngine] preloadEffect:@"Impact.wav"];
+    [[SimpleAudioEngine sharedEngine] preloadEffect:@"smw_coin.wav"];
+}
+
+-(void) setUpParticles{
+    _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
+    _particle.position = _waterBomb1.position;
+    [_particle stopSystem];
+    [_gameNode addChild:_particle];
 }
 
 - (void)addPoints{
@@ -120,7 +130,6 @@
     ChipmunkBody *firstChipmunkBody = firstBody->data;
     ChipmunkBody *secondChipmunkBody = secondBody->data;
     
-    
     // character reached goal
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_goal.chipmunkBody]){
         
@@ -138,6 +147,7 @@
     
     //if player hits waterbarrel
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_waterBomb1.chipmunkBody]){
+        if(_player->shield == NO){
             [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
             [_player hitbybomb];
             _followPlayer = NO;
@@ -146,7 +156,8 @@
             for(ChipmunkShape *shape in _waterBomb1.chipmunkBody.shapes){
                 [_space smartRemove:shape];
             }
-            [_waterBomb1 removeFromParentAndCleanup:YES];
+            [_waterBomb1 removeFromParentAndCleanup:YES];}
+        
     }
     
     //if player hits coin
@@ -160,24 +171,21 @@
         [_coin removeFromParentAndCleanup:YES];
     }
     
-    
-    //added handling for top and buttom, if i didnt have it i got an assembly error
-    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_top.chipmunkBody]){
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_shield.chipmunkBody]){
+        
+        _player->shield = YES;
+        
+        for(ChipmunkShape *shape in _shield.chipmunkBody.shapes){
+            [_space smartRemove:shape];
+        }
+        [_shield removeFromParentAndCleanup:YES];
     }
-    
-    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_terrainBody]){
-    }
-    
-    
     
     return YES;
 }
 
 - (void)setupGraphicsLandscape
 {
-    _skyLayer = [CCLayerGradient layerWithColor:ccc4(89, 67, 245, 255) fadingTo:ccc4(67, 219, 245, 255)];
-    [self addChild:_skyLayer];
-    
     _parallaxNode = [CCParallaxNode node];
     [self addChild:_parallaxNode];
     
@@ -200,14 +208,14 @@
 }
 
 - (void)setupPhysicsLandscape{
+    //adding physics to the ground so character doesnt fall through the world
     NSURL *url = [[NSBundle mainBundle] URLForResource:@"Ground" withExtension:@"png"];
     ChipmunkImageSampler *sampler = [ChipmunkImageSampler samplerWithImageFile:url isMask:NO];
     
     ChipmunkPolylineSet *contour = [sampler marchAllWithBorder:NO hard:YES];
     ChipmunkPolyline *line = [contour lineAtIndex:0];
     ChipmunkPolyline *simpleLine = [line simplifyCurves:1];
-    
-    _terrainBody = [ChipmunkBody staticBody];
+    ChipmunkBody *_terrainBody = [ChipmunkBody staticBody];
     NSArray *terrainShapes = [simpleLine asChipmunkSegmentsWithBody:_terrainBody radius:0 offset:cpvzero];
     for (ChipmunkShape *shape in terrainShapes)
         {
@@ -231,7 +239,7 @@
         {
             _parallaxNode.position = ccp(-(_player.position.x - (_winSize.width / 2)), 0);
         }
-        
+        //updating score on how far hes travelled
         score += 1;
         [self addPoints];
     }
@@ -239,22 +247,17 @@
     // Update logic goes here
 }
 
-- (void)generateRandomWind
-{
-    _windSpeed = CCRANDOM_MINUS1_1() * [_configuration[@"windMaxSpeed"] floatValue];
-}
 
 #pragma mark - My Touch Delegate Methods
 
 - (void)touchEnded{
+    // making character walk
     if(_followPlayer == NO){
         [_player walk:_hitByBomb];
         _hitByBomb = NO;
     }
     _followPlayer = YES;
     [_player jump];
-    /*CCMoveBy *move = [CCMoveBy actionWithDuration: 5 position:ccp(400,0)];
-    [_player runAction:move];*/
 }
 
 @end

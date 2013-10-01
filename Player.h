@@ -11,6 +11,8 @@
 @interface Player : CCPhysicsSprite
 {
     ChipmunkSpace *_space;
+    @public
+    BOOL shield;
 }
 
 - (id)initWithPosition:(ChipmunkSpace *)space position:(CGPoint)position;

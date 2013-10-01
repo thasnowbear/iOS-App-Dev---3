@@ -15,20 +15,19 @@
 @class Goal;
 @class WaterBomb;
 @class Coins;
+@class Shield;
 @interface GameScene : CCScene <InputLayerDelegate>
 {
     int thescore;
     CCLabelTTF *scoreLabel;
     CGSize _winSize;
     NSDictionary *_configuration;
-    CCLayerGradient *_skyLayer;
-    CGFloat _windSpeed;
     Player *_player;
     Top *_top;
     Goal *_goal;
     Coins *_coin;
-    ChipmunkBody *_terrainBody;
     double score;
+    Shield *_shield;
     WaterBomb *_waterBomb1;
     ChipmunkSpace *_space;
     ccTime _accumulator;
