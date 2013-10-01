@@ -1,5 +1,5 @@
 //
-//  WaterBomb.h
+//  Coins.h
 //  iOS App Dev
 //
 //  Created by Guet on 10/1/13.
@@ -9,9 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "cocos2d.h"
 
-@interface WaterBomb : CCPhysicsSprite{
-}
+@interface Coins : CCPhysicsSprite
+
 
 - (id)initWithSpace:(ChipmunkSpace
                      *)space position:(CGPoint)position;
+
 @end

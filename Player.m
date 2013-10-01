@@ -50,7 +50,7 @@
     [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
     }
     else{
-        cpVect impulseVector = cpv(200 * self.chipmunkBody.mass, 0);
+        cpVect impulseVector = cpv(250 * self.chipmunkBody.mass, 0);
         [self.chipmunkBody applyImpulse:impulseVector offset:cpvzero];
     }
 }

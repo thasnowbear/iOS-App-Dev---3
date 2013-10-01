@@ -15,6 +15,7 @@
 #import "SimpleAudioEngine.h"
 #import "CCParticleSystemQuad.h"
 #import "WaterBomb.h"
+#import "Coins.h"
 
 
 @implementation GameScene
@@ -66,6 +67,9 @@
         _waterBomb1 = [[WaterBomb alloc] initWithSpace:_space position:CGPointMake(230, 120)];
         [_gameNode addChild:_waterBomb1];
         
+        _coin = [[Coins alloc] initWithSpace:_space position:CGPointMake(430, 220)];
+        [_gameNode addChild:_coin];
+        
         _particle = [CCParticleSystemQuad particleWithFile:@"Explosion.plist"];
         _particle.position = _waterBomb1.position;
         [_particle stopSystem];
@@ -115,13 +119,24 @@
     
     //if player hits waterbarrel
     if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_waterBomb1.chipmunkBody]){
-        if(_waterBomb1->used == NO){
             [[SimpleAudioEngine sharedEngine] playEffect:@"Impact.wav" pitch:(CCRANDOM_0_1() * 0.3f) + 1 pan:0 gain:1];
-         [_player hitbybomb];
-        _followPlayer = NO;
-        _hitByBomb = YES;
-            _waterBomb1->used = YES;
-            [_particle resetSystem];}
+            [_player hitbybomb];
+            _followPlayer = NO;
+            _hitByBomb = YES;
+            [_particle resetSystem];
+            for(ChipmunkShape *shape in _waterBomb1.chipmunkBody.shapes){
+                [_space smartRemove:shape];
+            }
+            [_waterBomb1 removeFromParentAndCleanup:YES];
+    }
+    
+    //if player hits coin
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_coin.chipmunkBody]){
+        score += 1000;
+        for(ChipmunkShape *shape in _coin.chipmunkBody.shapes){
+            [_space smartRemove:shape];
+        }
+        [_coin removeFromParentAndCleanup:YES];
     }
     
     return YES;

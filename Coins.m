@@ -1,19 +1,18 @@
 //
-//  WaterBomb.m
+//  Coins.m
 //  iOS App Dev
 //
 //  Created by Guet on 10/1/13.
 //  Copyright (c) 2013 Sveinn Fannar Kristjansson. All rights reserved.
 //
 
-#import "ObjectiveChipmunk.h"
-#import "WaterBomb.h"
+#import "Coins.h"
 
-@implementation WaterBomb
+@implementation Coins
 
 -(id)initWithSpace:(ChipmunkSpace *)space position: (CGPoint) position
 {
-    self = [super initWithFile:@"WaterBarrel.png"];
+    self = [super initWithFile:@"coin.png"];
     if(self){
         CGSize size = self.textureRect.size;
         
