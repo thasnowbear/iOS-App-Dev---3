@@ -139,6 +139,16 @@
         [_coin removeFromParentAndCleanup:YES];
     }
     
+    
+    //added handling for top and buttom, if i didnt have it i got an assembly error
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_top.chipmunkBody]){
+    }
+    
+    if([self helper:firstChipmunkBody firstEqual:_player.chipmunkBody secondInput:secondChipmunkBody secondEqual:_terrainBody]){
+    }
+    
+    
+    
     return YES;
 }
 
@@ -176,8 +186,8 @@
     ChipmunkPolyline *line = [contour lineAtIndex:0];
     ChipmunkPolyline *simpleLine = [line simplifyCurves:1];
     
-    ChipmunkBody *terrainBody = [ChipmunkBody staticBody];
-    NSArray *terrainShapes = [simpleLine asChipmunkSegmentsWithBody:terrainBody radius:0 offset:cpvzero];
+    _terrainBody = [ChipmunkBody staticBody];
+    NSArray *terrainShapes = [simpleLine asChipmunkSegmentsWithBody:_terrainBody radius:0 offset:cpvzero];
     for (ChipmunkShape *shape in terrainShapes)
         {
             [_space addShape:shape];

@@ -25,6 +25,7 @@
     Top *_top;
     Goal *_goal;
     Coins *_coin;
+    ChipmunkBody *_terrainBody;
     double score;
     WaterBomb *_waterBomb1;
     ChipmunkSpace *_space;
